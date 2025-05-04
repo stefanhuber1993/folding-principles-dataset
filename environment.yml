@@ -1,0 +1,13 @@
+name: folding-dssp
+channels:
+  - salilab
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.9
+  - biopython
+  - pandas
+  - numpy
+  - requests
+  - dssp
+  - jupyterlab  # optional but helpful
