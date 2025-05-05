@@ -4,6 +4,7 @@ channels:
   - conda-forge
   - defaults
 dependencies:
+  - matplotlib
   - python=3.9
   - biopython
   - pandas

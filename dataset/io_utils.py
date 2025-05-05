@@ -28,7 +28,8 @@ def fetch_mmcif_file(pdb_id: str, outdir: str = ".", overwrite: bool = False) ->
 
 def run_dssp_on_mmcif(pdb_path: str, dssp_exe="mkdssp"):
     """
-    Run DSSP on an mmCIF structure file and return model + DSSP DataFrame.
+    Parse an mmCIF file and run DSSP.
+    On DSSP failure, issue a warning and return (None, None).
     """
     pdb_id = os.path.basename(pdb_path).split(".")[0]
     parser = MMCIFParser(QUIET=True)
@@ -38,7 +39,8 @@ def run_dssp_on_mmcif(pdb_path: str, dssp_exe="mkdssp"):
     try:
         dssp = DSSP(model, pdb_path, dssp=dssp_exe)
     except Exception as e:
-        raise RuntimeError(f"DSSP failed for {pdb_id}: {e}")
+        warnings.warn(f"DSSP failed for {pdb_id}: {e}", RuntimeWarning)
+        return model, None   # ← soft‑fail
 
     rows = []
     for key in dssp.keys():
