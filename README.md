@@ -44,4 +44,5 @@ The current workflow is demonstrated in **`notebooks/test_pipeline_parts.ipynb`*
 
 ## 3 · Example of a preliminary plot using 400 pdb files
 
-![image](https://github.com/user-attachments/assets/6e4deef0-ee84-40ef-a659-2662000196fb)
+<img width="329" alt="image" src="https://github.com/user-attachments/assets/55dd9c4c-0d84-4962-b08b-4820ea9e0803" />
+
