@@ -55,23 +55,17 @@ Additional filter used on abs(handedness_magnitude) > 0.8
 
 ## Appendix · Exact vs Backbone ββ‑chirality methods
 
-| Function (in `dataset/motif_logic.py`) | Vector **u** | Vector **v** | Vector **n** | Best for | Caveats |
-|----------------------------------------|--------------|--------------|--------------|----------|---------|
-| `detect_hairpins_and_chirality` <br>*(“exact / strand‑axis”)* | First‑strand axis  (Cα<sub>end</sub> − Cα<sub>start</sub>) | Midpoint<sub>strand1</sub> → Midpoint<sub>strand2</sub> | Cα→Cβ of residue before the loop | Fast; matches most published β‑hairpin surveys | Becomes noisy when strands are strongly twisted |
-| `detect_hairpins_and_chirality_backbone` <br>*(“backbone”)* | Backbone **N→C** of residue before loop | Cα<sub>pre</sub> → Cα<sub>post</sub> (across the loop) | Same Cα→Cβ side‑chain vector | Robust near the loop; insensitive to global sheet twist | Slightly slower (needs two residue look‑ups) |
+| Function (in `dataset/motif_logic.py`) | Vector **u** | Vector **v** | Vector **n** | Best for |
+|----------------------------------------|--------------|--------------|--------------|----------|
+| `detect_hairpins_and_chirality` <br>*(“exact / strand‑axis”)* | First‑strand axis  (Cα<sub>end</sub> − Cα<sub>start</sub>) | Midpoint<sub>strand1</sub> → Midpoint<sub>strand2</sub> | Cα→Cβ of residue before the loop | Fast; matches most published β‑hairpin surveys | 
+| `detect_hairpins_and_chirality_backbone` <br>*(“backbone”)* | Backbone **N→C** of residue before loop | Cα<sub>pre</sub> → Cα<sub>post</sub> (across the loop) | Same Cα→Cβ side‑chain vector | Robust near the loop; insensitive to global sheet twist | 
 
 Both return two chirality columns:
 
 * `handedness` → **“L”** or **“R”** (sign of the scalar triple product)  
-* `handedness_magnitude` → |scalar triple product|, *normalised*, ∈ [0 … 1]
-
-### Recommended filter
+* `handedness_magnitude` → |scalar triple product|, *normalised*, ∈ [-1 … 1]
 
 A magnitude close to 0 indicates an almost planar ββ‑unit where handedness is
 ambiguous.  Perhaps we should keep only “strong” events:
-
-```python
-strong = hairpins[hq_df["handedness_magnitude"].abs() > 0.75]
-```
 
 
