@@ -29,7 +29,7 @@ def plot_loop_length_chirality(
     import matplotlib.pyplot as plt
 
     if ax is None:
-        fig, ax = plt.subplots(figsize=(3, 2))
+        fig, ax = plt.subplots(figsize=(2, 2), dpi=150)
 
     # counts ---------------------------------------------------------------
     subset = df[df["loop_len"].isin(loop_lengths)]
@@ -56,7 +56,7 @@ def plot_loop_length_chirality(
            color="black",
            edgecolor="black",
            linewidth=1.0,
-           zorder=2)
+           zorder=2, label='L')
 
     ax.bar([i + bar_w/2 for i in x],
            counts.get("R", 0),
@@ -64,7 +64,7 @@ def plot_loop_length_chirality(
            color="white",
            edgecolor="black",
            linewidth=1.0,
-           zorder=2)
+           zorder=2, label="R")
 
     # text labels ----------------------------------------------------------
     # for i, length in enumerate(loop_lengths):
@@ -83,5 +83,7 @@ def plot_loop_length_chirality(
     ax.set_ylabel("Frequency", fontsize=9)
     ax.tick_params(axis="both", labelsize=8)
     ax.set_ylim(0, counts.values.max() * 1.15)
+
+    ax.legend(frameon=False, fontsize=8, loc="upper right")     # ← add this line
 
     return ax
