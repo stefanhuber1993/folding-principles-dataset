@@ -5,3 +5,6 @@ simplified_ss_map = {
     "E": "E", "B": "E",
     "G": "C", "T": "C", "S": "C", "-": "C"
 }
+
+
+CA_CB_BOND = 1.522  # Å

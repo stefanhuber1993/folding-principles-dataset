@@ -20,32 +20,18 @@ from typing import Iterable, Optional, Sequence
 import pandas as pd
 import matplotlib.pyplot as plt
 
-
 def plot_loop_length_chirality(
     df: pd.DataFrame,
     loop_lengths: Sequence[int] = (2, 3, 4, 5),
     ax: Optional[plt.Axes] = None,
 ):
-    """
-    Bar‑plot the count of β‑hairpins by loop length and chirality.
+    """Nature‑style bar chart of β‑hairpin chirality vs loop length."""
+    import matplotlib.pyplot as plt
 
-    Parameters
-    ----------
-    df : pd.DataFrame
-        Must contain columns "loop_len" and "handedness".
-    loop_lengths : iterable of int, default (2,3,4,5)
-        Loop lengths to include on the x‑axis (order preserved).
-    ax : matplotlib.axes.Axes, optional
-        Draw into this axis; if None, create a new figure+axis.
-
-    Returns
-    -------
-    matplotlib.axes.Axes
-    """
     if ax is None:
-        fig, ax = plt.subplots(figsize=(6, 4))
+        fig, ax = plt.subplots(figsize=(3, 2))
 
-    # group counts
+    # counts ---------------------------------------------------------------
     subset = df[df["loop_len"].isin(loop_lengths)]
     counts = (
         subset.groupby(["loop_len", "handedness"])
@@ -57,26 +43,45 @@ def plot_loop_length_chirality(
     bar_w = 0.35
     x = range(len(counts))
 
-    # L – black
+    # style ----------------------------------------------------------------
+    ax.grid(axis="y", color="0.85", lw=0.6, zorder=0)
+    ax.set_axisbelow(True)
+    for spine in ("top", "right"):
+        ax.spines[spine].set_visible(False)
+
+    # bars -----------------------------------------------------------------
     ax.bar([i - bar_w/2 for i in x],
            counts.get("L", 0),
            bar_w,
-           label="L",
+           color="black",
            edgecolor="black",
-           facecolor="black")
-    # R – white with black edge
+           linewidth=1.0,
+           zorder=2)
+
     ax.bar([i + bar_w/2 for i in x],
            counts.get("R", 0),
            bar_w,
-           label="R",
+           color="white",
            edgecolor="black",
-           facecolor="white")
+           linewidth=1.0,
+           zorder=2)
 
-    ax.set_xlabel("Loop length")
-    ax.set_ylabel("Count")
+    # text labels ----------------------------------------------------------
+    # for i, length in enumerate(loop_lengths):
+    #     for offset, hand in [(-bar_w/2, "L"), (bar_w/2, "R")]:
+    #         val = counts.at[length, hand] if hand in counts.columns else 0
+    #         if val == 0:
+    #             continue
+    #         ax.text(i + offset, val + 20, str(val),
+    #                 ha="center", va="bottom",
+    #                 fontsize=7)
+
+    # axes -----------------------------------------------------------------
     ax.set_xticks(x)
-    ax.set_xticklabels(loop_lengths)
-    ax.set_title("β‑hairpin loop length vs chirality")
-    ax.legend(frameon=False)
-    ax.figure.tight_layout()
+    ax.set_xticklabels(loop_lengths, fontsize=9)
+    ax.set_xlabel("Loop length", fontsize=9)
+    ax.set_ylabel("Frequency", fontsize=9)
+    ax.tick_params(axis="both", labelsize=8)
+    ax.set_ylim(0, counts.values.max() * 1.15)
+
     return ax

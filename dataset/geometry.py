@@ -1,4 +1,6 @@
 from Bio.PDB import Vector
+import numpy as np
+
 
 def get_ca_from_residue(residue):
     """Return the Cα Vector from a residue or None if missing."""
@@ -7,45 +9,55 @@ def get_ca_from_residue(residue):
     return None
 
 
+
+
 def get_cb_from_residue(residue):
     """
-    Return a Vector for the Cβ atom of a residue.
+    Return Cβ as a Bio.PDB.Vector.
 
-    • If CB exists           → use it.
-    • Else if backbone‑H     → use one of those.
-    • Else                   → construct pseudo‑CB from N–CA–C geometry.
+    • If a real “CB” atom exists → return it.
+    • Else build an idealised Cβ from backbone N–CA–C:
 
-    Always returns a Vector or None.
+          n̂ = unit(CA→N)                109.5°
+          ĉ = unit(CA→C)             N\         /C
+          n⊥ = n̂ − (n̂·ĉ)ĉ               \     /
+          dir = –½ n⊥ + √3⁄2 (ĉ×n⊥)          CA ●───► Cβ*
+          Cβ* = CA + 1.522 Å · dir
+
+      (dir is 109.5 ° from both backbone bonds, giving a true tetrahedral
+      side‑chain position.)
+
+    Returns
+    -------
+    Bio.PDB.Vector
+        Real or pseudo‑Cβ coordinates, or *None* if backbone atoms are missing.
     """
-    # 1. real Cβ
+    # ───────────────────────────────────────────────────────────────── real CB
     if "CB" in residue:
         return Vector(residue["CB"].get_coord())
 
-    # 2. any H attached to CA
-    for h in ("H", "HA", "1H", "2H", "HA2", "HA3"):
-        if h in residue:
-            return Vector(residue[h].get_coord())
-
-    # 3. pseudo‑CB from backbone
-    for atom in ("N", "CA", "C"):
-        if atom not in residue:
-            return None
+    # ───────────────────────────────────────────────────── require backbone N,C
+    if not all(a in residue for a in ("N", "CA", "C")):
+        return None
 
     N  = Vector(residue["N"].get_coord())
     CA = Vector(residue["CA"].get_coord())
     C  = Vector(residue["C"].get_coord())
 
-    v1 = (N - CA).normalized()
-    v2 = (C - CA).normalized()
+    # numpy arrays for safe scalar maths
+    n_hat = (N - CA).normalized().get_array()
+    c_hat = (C - CA).normalized().get_array()
 
-    # bisector (pointing away from backbone), then normalise
-    direction = -(v1 + v2).normalized()            # still a Vector
+    # component of n̂ orthogonal to ĉ
+    n_perp = n_hat - (n_hat @ c_hat) * c_hat
+    n_perp /= np.linalg.norm(n_perp)
 
-    # scale the *array* explicitly → 1.522 Å
-    direction_scaled = direction.get_array() * 1.522
-    pseudo_cb = Vector(CA.get_array() + direction_scaled)
+    # +120° rotation about ĉ :  dir = –½ n_perp + √3/2 (ĉ × n_perp)
+    dir = -0.5 * n_perp + (np.sqrt(3) / 2.0) * np.cross(c_hat, n_perp)
+    dir /= np.linalg.norm(dir)
 
-    return pseudo_cb
+    pseudo_cb = CA.get_array() + CA_CB_BOND * dir
+    return Vector(pseudo_cb)
 
 
 def identify_strands(df, min_len=2):

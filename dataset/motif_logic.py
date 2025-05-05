@@ -1,5 +1,6 @@
 import numpy as np
 from Bio.PDB import Vector
+from .constants import CA_CB_BOND
 from .geometry import get_ca_from_residue, get_cb_from_residue
 import pandas as pd
 

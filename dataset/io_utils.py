@@ -18,7 +18,7 @@ def fetch_mmcif_file(pdb_id: str, outdir: str = ".", overwrite: bool = False) ->
         return path
 
     url = f"https://files.rcsb.org/download/{filename}"
-    r = requests.get(url, timeout=10)
+    r = requests.get(url, timeout=30)
     r.raise_for_status()
 
     with open(path, "w") as f:
