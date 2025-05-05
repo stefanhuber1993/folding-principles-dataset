@@ -42,13 +42,28 @@ The current workflow is demonstrated in **`notebooks/test_pipeline_parts.ipynb`*
    * produce the loop‑length × handedness bar chart
 
 
-## 3 · Example of a preliminary plot using 400 pdb files
+## 3 · Dataset structure
+
+| idx | PDB  | Chain | strand1_start | strand1_end | strand2_start | strand2_end | loop_len | handedness | handedness_mag | FullChainSequence          | HairpinSequence                   | LoopSequence   |
+|----:|:----:|:-----:|--------------:|------------:|--------------:|------------:|---------:|:----------:|---------------:|:---------------------------|:----------------------------------|:--------------|
+| 0 | 3vor | A | 69  | 70  | 75  | 76  | 4 | **L** | −0.555 | GSDSRTVSE… | RNGISGDY | GISG |
+| 1 | 3vor | A | 75  | 76  | 78  | 83  | 1 | **L** | −0.622 | GSDSRTVSE… | DYIGIGGAI | *I* |
+| 2 | 3vor | A | 78  | 83  | 93  | 101 | 9 | **L** | −0.681 | GSDSRTVSE… | GIGGAITSSGSTINKGFAMELNGL | TSSGSTINK |
+| 3 | 3vor | A | 138 | 139 | 149 | 151 | 9 | **L** | −0.786 | GSDSRTVSE… | VNMLAATDNTTILR | MLAATDNTT |
+| 4 | 5gji | A | 354 | 359 | 368 | 374 | 8 | **L** | −0.229 | SNMSLQNAE… | TFLVRDASTKMHGDYTLTLRK | ASTKMHGD |
+| 5 | 5gji | A | 368 | 374 | 377 | 386 | 2 | **L** | −0.244 | SNMSLQNAE… | YTLTLRKGGNNKLIKIFHR | GG |
+| 6 | 5gji | A | 377 | 386 | 389 | 391 | 2 | **L** | −0.420 | SNMSLQNAE… | NNKLIKIFHRDGKYG | DG |
+| 7 | 5gji | A | 389 | 391 | 398 | 399 | 6 | **L** | −0.275 | SNMSLQNAE… | KYGFSDPLTFS | FSDPLT |
+| 8 | 4nsv | A | 8   | 9   | 25  | 30  | 15| **R** |  0.415 | GVSGSCNID… | IDVVCPEGNGHRDVIRSVAAYSR | VVCPEGNGHRDVIRS |
+| 9 | 4nsv | A | 25  | 30  | 33  | 41  | 2 | **R** |  0.956 | GVSGSCNID… | VAAYSRQGTMWCTGSLV | QG |
+
+
+
+## 4 · Plot of loop length versus handedness for 400 pdb files
 
 Additional filter used on abs(handedness_magnitude) > 0.8
 
 <img width="329" alt="image" src="https://github.com/user-attachments/assets/55dd9c4c-0d84-4962-b08b-4820ea9e0803" />
-
-
 
 
 
