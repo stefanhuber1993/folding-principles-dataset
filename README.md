@@ -41,3 +41,7 @@ The current workflow is demonstrated in **`notebooks/test_pipeline_parts.ipynb`*
    * compute chirality with both methods  
    * produce the loop‑length × handedness bar chart
 
+
+## 3 · Example of a preliminary plot using 400 pdb files
+
+![image](https://github.com/user-attachments/assets/6e4deef0-ee84-40ef-a659-2662000196fb)
