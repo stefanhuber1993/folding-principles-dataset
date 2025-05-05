@@ -1,8 +1,0 @@
-.gitignore
-__pycache__/
-.venv/
-*.__pyc
-*.npz
-*.csv
-data/*
-!data/README.md
