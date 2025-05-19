@@ -5,26 +5,41 @@ import pandas as pd
 from Bio import PDB
 from Bio.PDB import MMCIFParser, DSSP
 from dataset.constants import simplified_ss_map
+from pathlib import Path
 
 def fetch_mmcif_file(pdb_id: str, outdir: str = ".", overwrite: bool = False) -> str:
     """
-    Download mmCIF file for given PDB ID and return local path.
+    Download an mmCIF file for *pdb_id* only if it is not already on disk.
+
+    Parameters
+    ----------
+    pdb_id : str
+        4-letter PDB code (extra characters are ignored, case‐insensitive).
+    outdir : str
+        Directory where the file will be saved (created if missing).
+    overwrite : bool, default False
+        Re-download even if the file exists.
+
+    Returns
+    -------
+    str
+        Absolute path to the local mmCIF file.
     """
     pdb_id = pdb_id.lower()[:4]
-    filename = f"{pdb_id}.cif"
-    path = os.path.join(outdir, filename)
+    outdir = Path(outdir)
+    outdir.mkdir(parents=True, exist_ok=True)
 
-    if os.path.exists(path) and not overwrite:
-        return path
+    path = outdir / f"{pdb_id}.cif"
 
-    url = f"https://files.rcsb.org/download/{filename}"
+    if path.exists() and not overwrite:
+        return str(path)
+
+    url = f"https://files.rcsb.org/download/{pdb_id}.cif"
     r = requests.get(url, timeout=30)
     r.raise_for_status()
+    path.write_text(r.text)
 
-    with open(path, "w") as f:
-        f.write(r.text)
-
-    return path
+    return str(path)
 
 def run_dssp_on_mmcif(pdb_path: str, dssp_exe="mkdssp"):
     """

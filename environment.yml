@@ -12,3 +12,4 @@ dependencies:
   - requests
   - dssp
   - jupyterlab  # optional but helpful
+  - pytest # optional but helpful

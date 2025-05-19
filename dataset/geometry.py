@@ -1,5 +1,6 @@
 from Bio.PDB import Vector
 import numpy as np
+from dataset.constants import CA_CB_BOND 
 
 
 def get_ca_from_residue(residue):
@@ -13,30 +14,31 @@ def get_ca_from_residue(residue):
 
 def get_cb_from_residue(residue):
     """
-    Return Cβ as a Bio.PDB.Vector.
+    Return Cβ coordinates as Bio.PDB.Vector.
 
-    • If a real “CB” atom exists → return it.
-    • Else build an idealised Cβ from backbone N–CA–C:
+    • If a real “CB” atom exists → return it.  
+    • Otherwise build an *ideal* Cβ that is 109.5 ° from both backbone bonds,
+      and placed on the true side-chain side (opposite the carbonyl C).
 
-          n̂ = unit(CA→N)                109.5°
-          ĉ = unit(CA→C)             N\         /C
-          n⊥ = n̂ − (n̂·ĉ)ĉ               \     /
-          dir = –½ n⊥ + √3⁄2 (ĉ×n⊥)          CA ●───► Cβ*
-          Cβ* = CA + 1.522 Å · dir
+    Construction (works for any ∠N-CA-C):
+    ------------------------------------------------
+      u = unit (CA→N)
+      v = unit (CA→C)
 
-      (dir is 109.5 ° from both backbone bonds, giving a true tetrahedral
-      side‑chain position.)
+      â = (u − v)/‖u − v‖
+      b̂ = (u + v)/‖u + v‖
+      ŵ = â × b̂
 
-    Returns
-    -------
-    Bio.PDB.Vector
-        Real or pseudo‑Cβ coordinates, or *None* if backbone atoms are missing.
+      dir = −⅓ b̂ + (2√2/3) ŵ
+      if dir·v > 0 → flip dir (select side-chain lobe)
+
+      Cβ* = CA + CA_CB_BOND · dir
     """
-    # ───────────────────────────────────────────────────────────────── real CB
+    # 1 ───────────────────────────  real CB present
     if "CB" in residue:
         return Vector(residue["CB"].get_coord())
 
-    # ───────────────────────────────────────────────────── require backbone N,C
+    # 2 ───────────────────────────  backbone atoms required
     if not all(a in residue for a in ("N", "CA", "C")):
         return None
 
@@ -44,21 +46,25 @@ def get_cb_from_residue(residue):
     CA = Vector(residue["CA"].get_coord())
     C  = Vector(residue["C"].get_coord())
 
-    # numpy arrays for safe scalar maths
-    n_hat = (N - CA).normalized().get_array()
-    c_hat = (C - CA).normalized().get_array()
+    # unit backbone vectors (NumPy arrays)
+    u = (N - CA).normalized().get_array()    # CA→N
+    v = (C - CA).normalized().get_array()    # CA→C
 
-    # component of n̂ orthogonal to ĉ
-    n_perp = n_hat - (n_hat @ c_hat) * c_hat
-    n_perp /= np.linalg.norm(n_perp)
+    # orthonormal basis in N-CA-C plane
+    a = u - v;  a /= np.linalg.norm(a)
+    b = u + v;  b /= np.linalg.norm(b)
+    w = np.cross(a, b);  w /= np.linalg.norm(w)
 
-    # +120° rotation about ĉ :  dir = –½ n_perp + √3/2 (ĉ × n_perp)
-    dir = -0.5 * n_perp + (np.sqrt(3) / 2.0) * np.cross(c_hat, n_perp)
-    dir /= np.linalg.norm(dir)
+    # tetrahedral direction (109.47° from u and v)
+    dir_vec = (-1/3) * b + (2.0 * np.sqrt(2) / 3.0) * w
+    dir_vec /= np.linalg.norm(dir_vec)
 
-    pseudo_cb = CA.get_array() + CA_CB_BOND * dir
+    # ensure Cβ lies opposite the carbonyl C (true side-chain side)
+    if np.dot(dir_vec, v) > 0:
+        dir_vec = -dir_vec
+
+    pseudo_cb = CA.get_array() + CA_CB_BOND * dir_vec
     return Vector(pseudo_cb)
-
 
 def identify_strands(df, min_len=2):
     segments = []
