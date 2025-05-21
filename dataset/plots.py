@@ -19,6 +19,7 @@ Example
 from typing import Iterable, Optional, Sequence
 import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
 
 def plot_loop_length_chirality(
     df: pd.DataFrame,
@@ -26,7 +27,9 @@ def plot_loop_length_chirality(
     ax: Optional[plt.Axes] = None,
 ):
     """Nature‑style bar chart of β‑hairpin chirality vs loop length."""
-    import matplotlib.pyplot as plt
+    if df.empty:
+        print("Warning: empty DataFrame passed to plot_loop_length_chirality.")
+        return ax
 
     if ax is None:
         fig, ax = plt.subplots(figsize=(2, 2), dpi=150)
@@ -37,7 +40,7 @@ def plot_loop_length_chirality(
         subset.groupby(["loop_len", "handedness"])
                .size()
                .unstack(fill_value=0)
-               .reindex(loop_lengths)
+               .reindex(loop_lengths, fill_value=0)
     )
 
     bar_w = 0.35
@@ -50,31 +53,21 @@ def plot_loop_length_chirality(
         ax.spines[spine].set_visible(False)
 
     # bars -----------------------------------------------------------------
-    ax.bar([i - bar_w/2 for i in x],
-           counts.get("L", 0),
+    ax.bar([i - bar_w / 2 for i in x],
+           counts.get("L", pd.Series([0]*len(loop_lengths))),
            bar_w,
            color="black",
            edgecolor="black",
            linewidth=1.0,
            zorder=2, label='L')
 
-    ax.bar([i + bar_w/2 for i in x],
-           counts.get("R", 0),
+    ax.bar([i + bar_w / 2 for i in x],
+           counts.get("R", pd.Series([0]*len(loop_lengths))),
            bar_w,
            color="white",
            edgecolor="black",
            linewidth=1.0,
            zorder=2, label="R")
-
-    # text labels ----------------------------------------------------------
-    # for i, length in enumerate(loop_lengths):
-    #     for offset, hand in [(-bar_w/2, "L"), (bar_w/2, "R")]:
-    #         val = counts.at[length, hand] if hand in counts.columns else 0
-    #         if val == 0:
-    #             continue
-    #         ax.text(i + offset, val + 20, str(val),
-    #                 ha="center", va="bottom",
-    #                 fontsize=7)
 
     # axes -----------------------------------------------------------------
     ax.set_xticks(x)
@@ -82,8 +75,11 @@ def plot_loop_length_chirality(
     ax.set_xlabel("Loop length", fontsize=9)
     ax.set_ylabel("Frequency", fontsize=9)
     ax.tick_params(axis="both", labelsize=8)
-    ax.set_ylim(0, counts.values.max() * 1.15)
 
-    ax.legend(frameon=False, fontsize=8, loc="upper right")     # ← add this line
+    # safeguard for ylim --------------------------------------------------
+    max_val = counts.values.max()
+    ax.set_ylim(0, max_val * 1.15 if np.isfinite(max_val) and max_val > 0 else 1)
+
+    ax.legend(frameon=False, fontsize=8, loc="upper right")
 
     return ax

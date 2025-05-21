@@ -10,8 +10,6 @@ def get_ca_from_residue(residue):
     return None
 
 
-
-
 def get_cb_from_residue(residue):
     """
     Return Cβ coordinates as Bio.PDB.Vector.
@@ -66,18 +64,20 @@ def get_cb_from_residue(residue):
     pseudo_cb = CA.get_array() + CA_CB_BOND * dir_vec
     return Vector(pseudo_cb)
 
-def identify_strands(df, min_len=2):
-    segments = []
-    in_seg = False
-    for i, row in df.iterrows():
-        if row["SimpleSS"] == "E":
-            if not in_seg:
-                start = i
-                in_seg = True
-        else:
-            if in_seg and i - start >= min_len:
-                segments.append((start, i - 1))
-            in_seg = False
-    if in_seg and len(df) - start >= min_len:
-        segments.append((start, len(df) - 1))
-    return segments
+
+
+# def identify_strands(df, min_len=2):
+#     segments = []
+#     in_seg = False
+#     for i, row in df.iterrows():
+#         if row["SimpleSS"] == "E":
+#             if not in_seg:
+#                 start = i
+#                 in_seg = True
+#         else:
+#             if in_seg and i - start >= min_len:
+#                 segments.append((start, i - 1))
+#             in_seg = False
+#     if in_seg and len(df) - start >= min_len:
+#         segments.append((start, len(df) - 1))
+#     return segments
