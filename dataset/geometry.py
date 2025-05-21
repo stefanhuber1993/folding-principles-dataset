@@ -65,6 +65,17 @@ def get_cb_from_residue(residue):
     return Vector(pseudo_cb)
 
 
+def evaluate_triple_product_handedness(u, v, n):
+    u_arr = u.get_array() if isinstance(u, Vector) else u
+    v_arr = v.get_array() if isinstance(v, Vector) else v
+    n_arr = n.get_array() if isinstance(n, Vector) else n
+
+    numerator = np.dot(np.cross(u_arr, v_arr), n_arr)
+    denominator = np.linalg.norm(u_arr) * np.linalg.norm(v_arr) * np.linalg.norm(n_arr)
+    magnitude = numerator / denominator if denominator > 1e-6 else 0.0
+    handedness = "R" if magnitude > 0 else "L"
+    return handedness, magnitude
+
 
 # def identify_strands(df, min_len=2):
 #     segments = []

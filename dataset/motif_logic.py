@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from Bio.PDB import Vector
 from .constants import CA_CB_BOND
-from .geometry import get_ca_from_residue, get_cb_from_residue
+from .geometry import get_ca_from_residue, get_cb_from_residue, evaluate_triple_product_handedness
 
 def identify_strands(dssp_df, min_len=2):
     strands = []
@@ -37,6 +37,8 @@ def detect_hairpins(dssp_df):
             loop_len = s2_start - s1_end - 1
             if loop_len < 0:
                 continue
+            if loop_len > 5:
+                continue
 
             hairpin_sequence = ''.join(chain_df.loc[s1_start : s2_end, "AA"].tolist())
             loop_sequence = ''.join(chain_df.loc[s1_end + 1 : s2_start - 1, "AA"].tolist()) if loop_len > 0 else ""
@@ -58,16 +60,13 @@ def detect_hairpins(dssp_df):
             })
     return hairpins
 
-def evaluate_triple_product_handedness(u, v, n):
-    u_arr = u.get_array() if isinstance(u, Vector) else u
-    v_arr = v.get_array() if isinstance(v, Vector) else v
-    n_arr = n.get_array() if isinstance(n, Vector) else n
 
-    numerator = np.dot(np.cross(u_arr, v_arr), n_arr)
-    denominator = np.linalg.norm(u_arr) * np.linalg.norm(v_arr) * np.linalg.norm(n_arr)
-    magnitude = numerator / denominator if denominator > 1e-6 else 0.0
-    handedness = "R" if magnitude > 0 else "L"
-    return handedness, magnitude
+def detect_ab_motifs(dssp_df):
+    pass
+
+def detect_ba_motifs(dssp_df):
+    pass
+
 
 def assign_beta_chirality_strand_axis(model, dssp_df, hairpin_annotations):
     pdb_id = getattr(getattr(model, "parent", None), "id", "UNKNOWN")
@@ -145,3 +144,10 @@ def assign_beta_chirality_local(model, dssp_df, hairpin_annotations):
         })
 
     return pd.DataFrame(results)
+
+
+def assign_ab_chirality(model, dssp_df, ab_annotations):
+    pass
+
+def assign_ba_chirality(model, dssp_df, ba_annotations):
+    pass
