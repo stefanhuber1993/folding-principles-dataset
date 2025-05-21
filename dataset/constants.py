@@ -9,7 +9,7 @@
 # deactivated for now
 simplified_ss_map = {
     "H": "H", "I": "I",
-    "E": "E", "B": "B",
+    "E": "E", "B": "E",
     "G": "G", "T": "C", "S": "C", "-": "C"
 }
 

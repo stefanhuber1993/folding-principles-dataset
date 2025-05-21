@@ -11,5 +11,6 @@ dependencies:
   - numpy
   - requests
   - dssp
+  - tqdm
   - jupyterlab  # optional but helpful
   - pytest # optional but helpful
