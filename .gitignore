@@ -1,0 +1,6 @@
+__pycache__/
+.venv/
+*.__pyc
+notebooks/pdb_files/*
+notebooks/*cif
+notebooks/*pdb
