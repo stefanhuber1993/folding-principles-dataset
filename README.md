@@ -59,11 +59,14 @@ The current workflow is demonstrated in **`notebooks/test_pipeline_parts.ipynb`*
 
 
 
-## 4 · Plot of loop length versus handedness for 400 pdb files
+## 4 · Plot of loop length versus handedness for all 11,116 high-quality pdb entries
 
-Additional filter used on abs(handedness_magnitude) > 0.8
+Local method of loop chirality definition was used.
 
-<img width="329" alt="image" src="https://github.com/user-attachments/assets/55dd9c4c-0d84-4962-b08b-4820ea9e0803" />
+Additional filter used on abs(handedness_magnitude) > 0.75
+
+<img width="344" alt="image" src="https://github.com/user-attachments/assets/ed70bc1e-0f1f-4cd6-a0eb-a134f26b644d" />
+
 
 
 
