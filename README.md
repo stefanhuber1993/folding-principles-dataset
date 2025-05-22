@@ -71,7 +71,7 @@ Additional filter used on abs(handedness_magnitude) > 0.75
 
 
 
-## Appendix · Exact vs Backbone ββ‑chirality methods
+## Appendix · Exact vs Backbone ββ‑chirality methods OUTDATED!
 
 | Function (in `dataset/motif_logic.py`) | Vector **u** | Vector **v** | Vector **n** | Best for |
 |----------------------------------------|--------------|--------------|--------------|----------|
