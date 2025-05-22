@@ -14,3 +14,4 @@ dependencies:
   - tqdm
   - jupyterlab  # optional but helpful
   - pytest # optional but helpful
+  - logomaker # optional but nice for generating sequence logos
